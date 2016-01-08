@@ -2,7 +2,7 @@
 % Please edit documentation in R/hit.R
 \name{samp2.sigHierarchy}
 \alias{samp2.sigHierarchy}
-\title{Variabel Testing}
+\title{Variabel Testing along the hierarchy}
 \usage{
 samp2.sigHierarchy(j, x, y, hierarchy, family, test, x.notest, B, allSamp1.ids,
   allActSet.ids, upper.p, max.p.esti, gamma, hl.count, cores)
@@ -30,17 +30,17 @@ samp2.sigHierarchy(j, x, y, hierarchy, family, test, x.notest, B, allSamp1.ids,
 
 \item{upper.p}{P value upper huerarchy level of the clusters variables.}
 
-\item{max.p.esti}{Maximum alpha level. All p-values above this value are set 
+\item{max.p.esti}{Maximum alpha level. All p-values above this value are set
 to one. Small max.p.esti values reduce computing time.}
 
 \item{gamma}{Vector of gamma-values.}
 
-\item{hl.count}{Hierarchy level counter for parallelism}
+\item{hl.count}{Hierarchy level counter for parallelism.}
 
 \item{cores}{Number of cores for parallelising.}
 }
 \description{
-ANOVA Testing, Multiplicity Adjustment, Aggregating and 
+ANOVA Testing, Multiplicity Adjustment, Aggregating and
 Hierarchical Adjustment
 }
 \keyword{internal}
