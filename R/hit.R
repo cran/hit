@@ -17,8 +17,8 @@
 #' order is the target class). For "binomial" if \code{y} is presented as a
 #' vector, it will be coerced into a factor.
 #' @param B Number of sample-splits.
-#' @param p.samp1 Fraction of data used for the LASSO. The ANOVA uses
-#' \code{1 - p.samp1}.
+#' @param p.samp1 Fraction of data used for the LASSO. The hierachical ANOVA 
+#' testing uses \code{1 - p.samp1}.
 #' @param nfolds Number of folds (default is 10). See
 #' \code{\link[glmnet]{cv.glmnet}} for more details.
 #' @param lambda.opt Criterion for optimum selection of cross-validated lasso.
@@ -396,18 +396,23 @@ summary.hit <- function(object, alpha = 0.05, max.height, ...) {
   make.pVal <- function(i) {
     p.value <- object$pValues[i]
     inx <- object$hierarchy[[i]]
-    if (p.value <= alpha &&
-          (all(is.na(P.CLUSTER[inx])) ||
-             (all(!is.na(P.CLUSTER[inx]) &&
-                    P.CLUSTER[inx] <= alpha)))) {
+    height <- attr(object$hierarchy[[i]], "height")
+    if (p.value <= alpha && 
+        height <= max.height &&
+        (all(is.na(P.CLUSTER[inx])) || 
+         (all(!is.na(P.CLUSTER[inx]) && 
+              P.CLUSTER[inx] <= alpha)))) {
       P.CLUSTER[inx] <<-  p.value
       ID.CLUSTER[inx] <<- COUNTER
-      H.CLUSTER[inx] <<- attr(object$hierarchy[[i]], "height")
+      H.CLUSTER[inx] <<- height
       COUNTER <<- COUNTER + 1L
     }
     return(NULL)
   }
   stopifnot(inherits(object, "hit"))
+  stopifnot(alpha <= 0.999)
+  if (missing(max.height))
+    max.height <- attr(object$hierarchy[[1L]], "height")
   P.CLUSTER <- rep(NA_real_, length(object$hierarchy[[1L]]))
   ID.CLUSTER <- rep(NA_integer_, length(object$hierarchy[[1L]]))
   H.CLUSTER <- rep(NA_real_, length(object$hierarchy[[1L]]))
@@ -418,8 +423,6 @@ summary.hit <- function(object, alpha = 0.05, max.height, ...) {
                     heights = H.CLUSTER[non.na],
                     pValues = P.CLUSTER[non.na])
   rownames(out) <- names(object$hierarchy[[1L]])[non.na]
-  if (!missing(max.height))
-    out <- out[out[, 2L] <= max.height, ]
   if (ll <- length(unique(out[, 1L])))
     out[, 1L] <- as.integer(factor(out[, 1L], labels = 1L:ll))
   out
