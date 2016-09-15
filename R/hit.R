@@ -46,12 +46,12 @@
 #' n <- 80
 #' p <- 82
 #' ## x with correlated columns
-#' corMat <- toeplitz((p:1/p)^5)
+#' corMat <- toeplitz((p:1/p)^2)
 #' corMatQ <- chol(corMat)
 #' x <- matrix(rnorm(n * p), nrow = n) %*% corMatQ
 #' colnames(x) <- paste0("x", 1:p)
 #' ## y
-#' mu <- x[, c(5, 24, 72)] %*% c(3, 1, 2)
+#' mu <- x[, c(5, 10, 72)] %*% c(2, -2, 2)
 #' y <-  rnorm(n, mu)
 #' ## clustering of the clumns of x
 #' hc <- hclust(dist(t(x)))
@@ -87,7 +87,7 @@ hit <- function(x, y, hierarchy, family = "gaussian", B = 50, p.samp1 = 0.35,
   ##### Checks order of variats
   x.names <- colnames(x)
   hier.names <- names(hierarchy)
-  if (length(setdiff(hier.names, x.names)))
+  if (!all(hier.names %in% x.names))
     stop("'hierarchy' includs variabels not in 'x'")
   if (identical(hier.names, x.names)) {
     x.notest <- integer(0L)

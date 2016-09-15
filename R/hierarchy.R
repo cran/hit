@@ -4,9 +4,10 @@
 #' manner.
 #' 
 #' @param x A S3 object e.g. from hclust or dendrogram.
-#' @param max.height Is the maximal height below the global node height which is considered.
+#' @param max.height Is the maximal height below the height of the global node which is 
+#' considered.
 #' @param height A vector of heights at which nodes are grouped.
-#' @param names Variable names in the order in which the indexes shut be given to the 
+#' @param names Variable names in the order in which the indexes should be assigned to the 
 #' variables.
 #' @param ... Further arguments.
 #' 
@@ -63,9 +64,8 @@ as.hierarchy.dendrogram <- function(x, max.height, height, names, ...) {
     stop("'x' includs variabels not in 'names'")
   }
   out <- unname(dend2hier(x, as.numeric(height), as.character(names)))
-  ordAll <- order(out[[1L]])
-  out[[1L]][] <- out[[1L]][ordAll]
-  names(out[[1L]]) <- names(out[[1L]])[ordAll]
+  out[[1L]][] <- sort(out[[1L]])
+  names(out[[1L]]) <- names[out[[1L]]]
   class(out) <- "hierarchy"
   out
 }
@@ -109,7 +109,7 @@ names.hierarchy <- function(x) {
 #' @description Reorder indexes according to a vector of names.
 #' 
 #' @param x A \code{\link{as.hierarchy}}.
-#' @param names Variable names in the order in which the indexes shut be given to the 
+#' @param names Variable names in the order in which the indexes should be assigned to the 
 #' variables.
 #' @param ... Further arguments passed to or from other methods (not used).
 #' 
@@ -118,13 +118,13 @@ names.hierarchy <- function(x) {
 reorder.hierarchy <- function(x, names, ...) {
   if (!inherits(x, "hierarchy")) 
     stop("'x' is not a hierarchy")
-  if (length(setdiff(names(x[[1L]]), names)))
+  if (!all(names(x[[1L]]) %in% names))
     stop("'x' includs variabels not in 'names'")
   newOrder <- match(names(x[[1L]]), names)
-  out <- lapply(x, function(x, newOrder) {
-    x[] <- sort(newOrder[x]) 
-    x
-  }, newOrder)
+  out <- lapply(x, function(xi, x1, newOrder) {
+    xi[] <- sort(newOrder[match(xi, x1)])
+    xi
+  }, x1 = x[[1L]], newOrder = newOrder)
   names(out[[1L]]) <- names[out[[1L]]]
   class(out) <- "hierarchy"
   out
